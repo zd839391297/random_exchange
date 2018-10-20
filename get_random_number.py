@@ -1,27 +1,36 @@
-#This file aims to get random number
-#The random numbers will be output to random.txt
+# This file aims to get random number
+# The random numbers will be output to random.txt
 # The random number was from https://www.random.org/
 import numpy as np
 import requests
 from bs4 import BeautifulSoup
 
-url = "https://www.random.org/integers/?num=3000&min=1&max=30&col=30&base=10&format=html&rnd=new"
-code = "utf-8"
-r = requests.get(url)
-r.raise_for_status()
-r.encoding = code
-html = r.text
-soup = BeautifulSoup(html, "html.parser")
-number = soup.find('pre')
-num = number.text
-print(num)
-random_num = np.fromstring(num, dtype=np.uint8)
-random_num.shape = (30,100)
-print(random_num)
-np.savetxt("random.txt",random_num)
+
+def get_num():
+    url = "https://www.random.org/integers/?num=30& / min=1&max=30&col=30&base=10&format=html&rnd=new"
+    code = "utf-8"
+    r = requests.get(url)
+    r.raise_for_status()
+    r.encoding = code
+    html = r.text
+    soup = BeautifulSoup(html, "html.parser")
+    number = soup.find('pre')
+    num = number.text
+    # print(num)
+    random_num = np.fromstring(num, dtype=int, sep=" ")
+    random_num.shape = (1, 30)
+    # print(random_num)
+    return random_num
 
 
-# This is another kind of methods below  
+num_file = np.zeros(shape=(30, 30), dtype=np.int8)
+for i in range(0, 30):
+    num_file[i] = get_num()
+np.savetxt("random.txt", num_file, fmt='%s', newline='\n')
+# np.savetxt("random.txt",num)
+
+
+# This is another kind of methods below
 # from selenium import webdriver
 # import io
 # import sys
@@ -44,4 +53,3 @@ driver.find_element_by_name("Get Numbers").click()
 
 # driver = webdriver.Chrome()
 # driver.get("https://www.random.org/integers/?num=10000&min=1&max=30&col=30&base=10&format=html&rnd=new")
-
